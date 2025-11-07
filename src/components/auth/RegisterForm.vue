@@ -7,8 +7,23 @@
   <form @submit.prevent="register">
     <h3>Register Here</h3>
 
-    <label for="username">Email</label>
-    <input type="text" placeholder="Enter your email" id="username" v-model="email" />
+    <label for="firstName">First Name</label>
+    <input type="text" placeholder="Enter your first name" id="firstName" v-model="firstName" />
+
+    <label for="lastName">Last Name</label>
+    <input type="text" placeholder="Enter your last name" id="lastName" v-model="lastName" />
+
+    <label for="dateOfBirth">Date of Birth</label>
+    <input type="date" id="dateOfBirth" v-model="dateOfBirth" />
+
+    <label for="country">Country</label>
+    <input type="text" placeholder="Enter your country" id="country" v-model="country" />
+
+    <label for="address">Address</label>
+    <input type="text" placeholder="Enter your address" id="address" v-model="address" />
+
+    <label for="email">Email</label>
+    <input type="email" placeholder="Enter your email" id="email" v-model="email" />
 
     <label for="password">Password</label>
     <input type="password" placeholder="Enter your password" id="password" v-model="password" />
@@ -23,7 +38,6 @@
 </template>
 
 <style>
-/* ✅ puedes reutilizar los mismos estilos del LoginForm */
 *:before,
 *:after {
   padding: 0;
@@ -58,8 +72,7 @@ body {
   bottom: -80px;
 }
 form {
-  height: 520px;
-  width: 400px;
+  width: 420px;
   background-color: rgba(255, 255, 255, 0.13);
   position: absolute;
   transform: translate(-50%, -50%);
@@ -69,7 +82,9 @@ form {
   backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
-  padding: 50px 35px;
+  padding: 40px 35px;
+  overflow-y: auto;
+  max-height: 95vh;
 }
 form * {
   font-family: 'Poppins', sans-serif;
@@ -86,13 +101,13 @@ form h3 {
 }
 label {
   display: block;
-  margin-top: 30px;
+  margin-top: 20px;
   font-size: 16px;
   font-weight: 500;
 }
 input {
   display: block;
-  height: 50px;
+  height: 40px;
   width: 100%;
   background-color: rgba(255, 255, 255, 0.07);
   border-radius: 3px;
@@ -105,18 +120,18 @@ input {
   color: #e5e5e5;
 }
 button {
-  margin-top: 50px;
+  margin-top: 30px;
   width: 100%;
   background-color: #ffffff;
   color: #080710;
-  padding: 15px 0;
+  padding: 12px 0;
   font-size: 18px;
   font-weight: 600;
   border-radius: 5px;
   cursor: pointer;
 }
 .social {
-  margin-top: 30px;
+  margin-top: 20px;
   display: flex;
   justify-content: center;
   gap: 15px;
@@ -146,40 +161,47 @@ export default {
   name: 'RegisterForm',
   data() {
     return {
+      firstName: '',
+      lastName: '',
+      dateOfBirth: '',
+      country: '',
+      address: '',
       email: '',
       password: '',
     }
   },
   methods: {
-    register() {
-      console.log('Registrando usuario:', this.email)
-      let endpointUrl = '/api/user/signin'
+    async register() {
+      let endpointUrl = '/api/user/signup'
       let newUser = {
+        firstName: this.firstName,
+        lastName: this.lastName,
+        dateOfBirth: this.dateOfBirth,
+        country: this.country,
+        address: this.address,
         email: this.email,
         password: this.password,
       }
 
-      this.$api
-        .post(endpointUrl, newUser)
-        .then((response) => {
-          console.log('Usuario registrado:', response)
-          this.$q.notify({
-            type: 'positive',
-            message: '✅ Registro exitoso',
-            position: 'top',
-            timeout: 2000,
-          })
+      try {
+        const response = await this.$api.post(endpointUrl, newUser)
+        console.log('Usuario registrado:', response.data)
+        this.$q.notify({
+          type: 'positive',
+          message: '✅ Registro exitoso',
+          position: 'top',
+          timeout: 2000,
         })
-        .catch((error) => {
-          console.error('Error al registrar:', error)
-          let msg = error.response?.data?.message || 'Ocurrió un error al registrar el usuario'
-          this.$q.notify({
-            type: 'negative',
-            message: msg,
-            position: 'bottom',
-            timeout: 2000,
-          })
+      } catch (error) {
+        console.error('Error al registrar:', error)
+        let msg = error.response?.data?.message || '❌ Error de conexión con el servidor'
+        this.$q.notify({
+          type: 'negative',
+          message: msg,
+          position: 'bottom',
+          timeout: 2000,
         })
+      }
     },
   },
 }
